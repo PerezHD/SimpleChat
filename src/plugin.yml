@@ -1,0 +1,10 @@
+name: SimpleChat
+description: Simple chat cleaning plugin!
+version: 1.0
+author: Harry5573
+website: www.harry5573.co.uk
+main: com.harry5573.simplechat.SimpleChat
+commands:
+  simplechat:
+    description: Main plugin command
+    aliases: [chat]
