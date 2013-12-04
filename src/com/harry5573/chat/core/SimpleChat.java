@@ -13,8 +13,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package com.harry5573.simplechat;
+package com.harry5573.chat.core;
 
+import com.harry5573.chat.command.CommandListener;
+import com.harry5573.chat.listener.EventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +116,11 @@ public class SimpleChat extends JavaPlugin {
         return advertising;
     }
 
+    /**
+     * Checks if an ip has been posted
+     * @param message
+     * @return 
+     */
     private int checkForIPPattern(String message) {
         int advertising = 0;
         Matcher regexMatcher = ipPattern.matcher(message);
@@ -128,6 +135,11 @@ public class SimpleChat extends JavaPlugin {
         return advertising;
     }
 
+    /**
+     * Checks if it is a URL
+     * @param message
+     * @return 
+     */
     private int checkForWebPattern(String message) {
         int advertising = 0;
         Matcher regexMatcherurl = webpattern.matcher(message);
@@ -142,7 +154,11 @@ public class SimpleChat extends JavaPlugin {
         }
         return advertising;
     }
-    
+
+    /**
+     * Method for handling advertisers
+     * @param p 
+     */
     public void handleAdvertiser(final Player p) {
         if (this.advertiser.contains(p)) {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -153,8 +169,17 @@ public class SimpleChat extends JavaPlugin {
                 }
             }, 1L);
         } else {
-            p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. (Do it again and you get banned)");
+            p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. You are now flagged as a advertiser for 1 minute. (Do that again within the minute you get banned.)");
             this.advertiser.add(p);
+
+            //UNFLAG Task
+            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    p.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "You are no longer flagged as an advertiser.");
+                    plugin.advertiser.remove(p);
+                }
+            }, 60 * 20L);
         }
     }
 }

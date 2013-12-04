@@ -17,9 +17,8 @@ delay: 3
 # If someone postes an ip shall we ban them after a warning?
 banip: true
 #
-# If someone postes a url ip shall we ban them after a warning?
+# If someone postes a url shall we ban them after a warning?
 banweb: true
 #
 # Website to use for the ban message
 website: 'www.arkhamnetwork.org'
-

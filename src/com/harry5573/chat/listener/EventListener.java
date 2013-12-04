@@ -13,8 +13,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package com.harry5573.simplechat;
+package com.harry5573.chat.listener;
 
+import com.harry5573.chat.core.SimpleChat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -37,7 +38,7 @@ public class EventListener implements Listener {
         this.plugin = instance;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String msg = e.getMessage();
@@ -56,10 +57,10 @@ public class EventListener implements Listener {
             if (plugin.hasntMoved.contains(p)) {
                 p.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
                 e.setCancelled(true);
-                return;
             }
+            return;
         }
-        
+
         // Check they are not in the cooldown
         if (plugin.cantChat.contains(p)) {
             p.sendMessage(ChatColor.RED + "You cannot chat again yet! (" + plugin.getConfig().getInt("delay") + " second delay)");
@@ -71,15 +72,13 @@ public class EventListener implements Listener {
 
         // Stop duplicate messages
         if (plugin.getConfig().getBoolean("blockdupemsg") != false) {
-
             if (plugin.lastMessage.containsKey(p)) {
                 String oldmsg = plugin.lastMessage.get(p);
                 plugin.lastMessage.remove(p);
+
                 if (msg.contains(oldmsg)) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Please do not send duplicate messages!");
                     e.setCancelled(true);
-                    plugin.lastMessage.put(p, msg);
-                    return;
                 }
             }
 
