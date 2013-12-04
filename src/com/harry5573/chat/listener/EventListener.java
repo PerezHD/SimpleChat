@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.chat.listener;
 
 import com.harry5573.chat.core.SimpleChat;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,13 +31,13 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 public class EventListener implements Listener {
 
-    public static SimpleChat plugin;
+    SimpleChat plugin;
 
     public EventListener(SimpleChat instance) {
         this.plugin = instance;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String msg = e.getMessage();
@@ -47,17 +46,15 @@ public class EventListener implements Listener {
             return;
         }
 
-        if (plugin.isChatHalted != false) {
+        if (plugin.isChatHalted) {
             e.getPlayer().sendMessage(ChatColor.GRAY + "Chat is currently halted.");
             e.setCancelled(true);
             return;
         }
 
-        if (plugin.getConfig().getBoolean("blockchatuntilmoved") != false) {
-            if (plugin.hasntMoved.contains(p)) {
-                p.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
-                e.setCancelled(true);
-            }
+        if (plugin.getConfig().getBoolean("blockchatuntilmoved") && plugin.hasntMoved.contains(p)) {
+            p.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
+            e.setCancelled(true);
             return;
         }
 
@@ -68,20 +65,19 @@ public class EventListener implements Listener {
             return;
         }
 
-        plugin.chatCooldown(p);
-
         // Stop duplicate messages
         if (plugin.getConfig().getBoolean("blockdupemsg") != false) {
+            
             if (plugin.lastMessage.containsKey(p)) {
                 String oldmsg = plugin.lastMessage.get(p);
                 plugin.lastMessage.remove(p);
-
                 if (msg.contains(oldmsg)) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Please do not send duplicate messages!");
                     e.setCancelled(true);
                 }
             }
 
+            //After all that add them
             plugin.lastMessage.put(p, msg);
         }
 
@@ -91,6 +87,9 @@ public class EventListener implements Listener {
             plugin.handleAdvertiser(p);
             e.setCancelled(true);
         }
+        
+        plugin.chatCooldown(p);
+        
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

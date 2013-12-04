@@ -60,7 +60,7 @@ public class SimpleChat extends JavaPlugin {
         this.loadPrefix();
 
         this.registerCommands();
-        this.registerEvents();
+        this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
 
         this.log("Plugin started!");
     }
@@ -72,11 +72,6 @@ public class SimpleChat extends JavaPlugin {
   
     private void registerCommands() {
         getCommand("chat").setExecutor(new CommandListener(this));
-    }
-
-    private void registerEvents() {
-        PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvents(new EventListener(this), this);
     }
 
     public void log(String msg) {
