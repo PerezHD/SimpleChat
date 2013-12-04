@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -53,21 +54,29 @@ public class SimpleChat extends JavaPlugin {
         plugin = this;
         
         this.log("Version " + this.getDescription().getVersion() + " starting up...");
-        
+
         this.saveDefaultConfig();
-        
+
         this.loadPrefix();
-        
-        this.getCommand("chat").setExecutor(new CommandListener(this));
-        this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
-        
-        
+
+        this.registerCommands();
+        this.registerEvents();
+
         this.log("Plugin started!");
-    } 
-    
+    }
+
     @Override
     public void onDisable() {
         this.log("Plugin disabled safely!");
+    }
+  
+    private void registerCommands() {
+        getCommand("chat").setExecutor(new CommandListener(this));
+    }
+
+    private void registerEvents() {
+        PluginManager pm = this.getServer().getPluginManager();
+        pm.registerEvents(new EventListener(this), this);
     }
 
     public void log(String msg) {
