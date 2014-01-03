@@ -11,7 +11,7 @@
     <description>Builds, tests, and runs the project SimpleChat.</description>
     <import file="nbproject/build-impl.xml"/>
                                     <target name="-post-jar">
-<copy file="${dist.jar}" flatten="true" todir="C:\Users\Harry5573\Documents\Minecraft\CODING\Test Server\plugins"/> 
+<copy file="${dist.jar}" flatten="true" todir="C:\Users\devan_000\Documents\Minecraft\CODING\Test Server\plugins"/> 
 </target>
     <!--
 

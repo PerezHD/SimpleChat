@@ -103,12 +103,13 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMove(PlayerMoveEvent e) {
-        
-        if ((e.getFrom().getBlockX() != e.getTo().getBlockX()) || (e.getFrom().getBlockZ() != e.getTo().getBlockZ())) {
-            Player p = e.getPlayer();
-            if (plugin.hasntMoved.contains(p)) {
-                plugin.hasntMoved.remove(p);
-            }
+
+        if ((e.getFrom().getBlockX() == e.getTo().getBlockX()) && (e.getFrom().getBlockZ() == e.getTo().getBlockZ())) {
+            return;
+        }
+        Player p = e.getPlayer();
+        if (plugin.hasntMoved.contains(p)) {
+            plugin.hasntMoved.remove(p);
         }
     }
 }
