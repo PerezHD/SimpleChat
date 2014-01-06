@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package com.harry5573.chat.command;
 
-import com.harry5573.chat.core.SimpleChat;
+import com.harry5573.chat.SimpleChatPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -27,13 +27,9 @@ import org.bukkit.entity.Player;
  *
  * @author Harry5573
  */
-public class CommandListener implements CommandExecutor {
+public class CommandChat implements CommandExecutor {
 
-    public static SimpleChat plugin;
-
-    public CommandListener(SimpleChat instance) {
-        this.plugin = instance;
-    }
+    static SimpleChatPlugin plugin = SimpleChatPlugin.get();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {

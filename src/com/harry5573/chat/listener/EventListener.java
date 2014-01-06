@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package com.harry5573.chat.listener;
 
-import com.harry5573.chat.core.SimpleChat;
+import com.harry5573.chat.SimpleChatPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,11 +31,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 public class EventListener implements Listener {
 
-    SimpleChat plugin;
-
-    public EventListener(SimpleChat instance) {
-        this.plugin = instance;
-    }
+    static SimpleChatPlugin plugin = SimpleChatPlugin.get();
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent e) {
@@ -47,7 +43,7 @@ public class EventListener implements Listener {
         }
 
         if (plugin.isChatHalted) {
-            e.getPlayer().sendMessage(ChatColor.GRAY + "Chat is currently halted.");
+            p.sendMessage(ChatColor.GRAY + "Chat is currently halted.");
             e.setCancelled(true);
             return;
         }
@@ -58,41 +54,38 @@ public class EventListener implements Listener {
             return;
         }
 
-        // Check they are not in the cooldown
         if (plugin.cantChat.contains(p)) {
             p.sendMessage(ChatColor.RED + "You cannot chat again yet! (" + plugin.getConfig().getInt("delay") + " second delay)");
             e.setCancelled(true);
             return;
         }
 
-        // Stop duplicate messages
         if (plugin.getConfig().getBoolean("blockdupemsg") != false) {
-            
+
             if (plugin.lastMessage.containsKey(p)) {
                 String oldmsg = plugin.lastMessage.get(p);
                 plugin.lastMessage.remove(p);
                 if (msg.contains(oldmsg)) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Please do not send duplicate messages!");
                     e.setCancelled(true);
+                    plugin.lastMessage.put(p, msg);
+                    return;
                 }
             }
 
-            //After all that add them
             plugin.lastMessage.put(p, msg);
         }
 
-        // Check if there advertising
-        int i = plugin.checkForAdvertising(msg);
-        if (i != 0) {
+        if (plugin.checkForAdvertising(msg) != 0) {
             plugin.handleAdvertiser(p);
             e.setCancelled(true);
+            return;
         }
-        
+
         plugin.chatCooldown(p);
-        
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
@@ -101,12 +94,12 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent e) {
-
         if ((e.getFrom().getBlockX() == e.getTo().getBlockX()) && (e.getFrom().getBlockZ() == e.getTo().getBlockZ())) {
             return;
         }
+
         Player p = e.getPlayer();
         if (plugin.hasntMoved.contains(p)) {
             plugin.hasntMoved.remove(p);

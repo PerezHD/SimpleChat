@@ -1,21 +1,20 @@
 /*Copyright (C) Harry5573 2013-14
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
+package com.harry5573.chat;
 
-package com.harry5573.chat.core;
-
-import com.harry5573.chat.command.CommandListener;
+import com.harry5573.chat.command.CommandChat;
 import com.harry5573.chat.listener.EventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,46 +31,55 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author Harry5573
  */
-public class SimpleChat extends JavaPlugin {
+public class SimpleChatPlugin extends JavaPlugin {
 
-    public static SimpleChat plugin;
-    
+    public static SimpleChatPlugin plugin;
+
     public boolean isChatHalted = false;
-    
+
     public String prefix;
-    
-    public List<Player>hasntMoved = new ArrayList<>();
-    public HashMap<Player, String>lastMessage = new HashMap<>();
-    
-    public List<Player>cantChat = new ArrayList<>();
-    public List<Player>advertiser = new ArrayList<>();
-    
+
+    public HashMap<Player, String> lastMessage = new HashMap<>();
+
+    public List<Player> hasntMoved = new ArrayList<>();
+    public List<Player> cantChat = new ArrayList<>();
+    public List<Player> advertiser = new ArrayList<>();
+
     private final Pattern ipPattern = Pattern.compile("((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))");
     private final Pattern webpattern = Pattern.compile("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
-    
+
+    public static SimpleChatPlugin get() {
+        return plugin;
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
-        
-        this.log("Version " + this.getDescription().getVersion() + " starting up...");
 
-        this.saveDefaultConfig();
+        log("Version " + this.getDescription().getVersion() + " starting up...");
 
-        this.loadPrefix();
+        saveDefaultConfig();
 
-        this.registerCommands();
-        this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
+        loadPrefix();
 
-        this.log("Plugin started!");
+        registerCommands();
+        registerEvents();
+
+        log("Plugin started!");
     }
 
     @Override
     public void onDisable() {
         this.log("Plugin disabled safely!");
     }
-  
+
+    private void registerEvents() {
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new EventListener(), this);
+    }
+
     private void registerCommands() {
-        getCommand("chat").setExecutor(new CommandListener(this));
+        getCommand("chat").setExecutor(new CommandChat());
     }
 
     public void log(String msg) {
@@ -91,20 +99,20 @@ public class SimpleChat extends JavaPlugin {
     public String translateToColorCode(String msg) {
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
-    
+
     public void loadPrefix() {
         this.prefix = this.translateToColorCode(this.getConfig().getString("prefix"));
     }
-    
-    public void chatCooldown(final Player p) {
-        this.cantChat.add(p);
 
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+    public void chatCooldown(final Player p) {
+        cantChat.add(p);
+
+        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             @Override
             public void run() {
                 plugin.cantChat.remove(p);
             }
-        }, this.getConfig().getInt("delay") * 20);
+        }, getConfig().getInt("delay") * 20);
     }
 
     public int checkForAdvertising(String message) {
@@ -112,7 +120,7 @@ public class SimpleChat extends JavaPlugin {
         if (this.getConfig().getBoolean("banip")) {
             advertising = checkForIPPattern(message);
         }
-        
+
         if (advertising == 0 && this.getConfig().getBoolean("banweb")) {
             advertising = checkForWebPattern(message);
         }
@@ -122,8 +130,9 @@ public class SimpleChat extends JavaPlugin {
 
     /**
      * Checks if an ip has been posted
+     *
      * @param message
-     * @return 
+     * @return
      */
     private int checkForIPPattern(String message) {
         int advertising = 0;
@@ -141,8 +150,9 @@ public class SimpleChat extends JavaPlugin {
 
     /**
      * Checks if it is a URL
+     *
      * @param message
-     * @return 
+     * @return
      */
     private int checkForWebPattern(String message) {
         int advertising = 0;
@@ -161,11 +171,12 @@ public class SimpleChat extends JavaPlugin {
 
     /**
      * Method for handling advertisers
-     * @param p 
+     *
+     * @param p
      */
     public void handleAdvertiser(final Player p) {
-        if (this.advertiser.contains(p)) {
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        if (advertiser.contains(p)) {
+            getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tempban " + p.getName() + " 1month Autoban for advertising appeal at " + plugin.getConfig().getString("website"));
@@ -173,11 +184,10 @@ public class SimpleChat extends JavaPlugin {
                 }
             }, 1L);
         } else {
-            p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. You are now flagged as a advertiser for 1 minute. (Do that again within the minute you get banned.)");
-            this.advertiser.add(p);
+            p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. Do not chat again for 1 minute. (Or you will be banned!)");
+            advertiser.add(p);
 
-            //UNFLAG Task
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     p.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "You are no longer flagged as an advertiser.");
