@@ -14,11 +14,12 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.chat;
 
+import com.google.common.collect.Lists;
 import com.harry5573.chat.command.CommandChat;
 import com.harry5573.chat.listener.EventListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
@@ -33,17 +34,17 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class SimpleChatPlugin extends JavaPlugin {
 
-    public static SimpleChatPlugin plugin;
+    private static SimpleChatPlugin plugin;
 
     public boolean isChatHalted = false;
 
     public String prefix;
 
-    public HashMap<Player, String> lastMessage = new HashMap<>();
+    public HashMap<UUID, String> lastMessage = new HashMap<>();
 
-    public List<Player> hasntMoved = new ArrayList<>();
-    public List<Player> cantChat = new ArrayList<>();
-    public List<Player> advertiser = new ArrayList<>();
+    public List<UUID> hasntMoved = Lists.newArrayList();
+    public List<UUID> cantChat = Lists.newArrayList();
+    public List<UUID> advertiser = Lists.newArrayList();
 
     private final Pattern ipPattern = Pattern.compile("((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))");
     private final Pattern webpattern = Pattern.compile("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
@@ -105,12 +106,14 @@ public class SimpleChatPlugin extends JavaPlugin {
     }
 
     public void chatCooldown(final Player p) {
-        cantChat.add(p);
+        final UUID uniqueID = p.getUniqueId();
+
+        cantChat.add(uniqueID);
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             @Override
             public void run() {
-                plugin.cantChat.remove(p);
+                plugin.cantChat.remove(uniqueID);
             }
         }, getConfig().getInt("delay") * 20);
     }
@@ -128,12 +131,6 @@ public class SimpleChatPlugin extends JavaPlugin {
         return advertising;
     }
 
-    /**
-     * Checks if an ip has been posted
-     *
-     * @param message
-     * @return
-     */
     private int checkForIPPattern(String message) {
         int advertising = 0;
         Matcher regexMatcher = ipPattern.matcher(message);
@@ -148,12 +145,6 @@ public class SimpleChatPlugin extends JavaPlugin {
         return advertising;
     }
 
-    /**
-     * Checks if it is a URL
-     *
-     * @param message
-     * @return
-     */
     private int checkForWebPattern(String message) {
         int advertising = 0;
         Matcher regexMatcherurl = webpattern.matcher(message);
@@ -169,13 +160,10 @@ public class SimpleChatPlugin extends JavaPlugin {
         return advertising;
     }
 
-    /**
-     * Method for handling advertisers
-     *
-     * @param p
-     */
     public void handleAdvertiser(final Player p) {
-        if (advertiser.contains(p)) {
+        final UUID uniqueID = p.getUniqueId();
+
+        if (advertiser.contains(uniqueID)) {
             getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -185,13 +173,15 @@ public class SimpleChatPlugin extends JavaPlugin {
             }, 1L);
         } else {
             p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. Do not chat again for 1 minute. (Or you will be banned!)");
-            advertiser.add(p);
+            advertiser.add(uniqueID);
 
             getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
-                    p.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "You are no longer flagged as an advertiser.");
-                    plugin.advertiser.remove(p);
+                    if (p.isOnline()) {
+                        p.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "You are no longer flagged as an advertiser.");
+                    }
+                    plugin.advertiser.remove(uniqueID);
                 }
             }, 60 * 20L);
         }
