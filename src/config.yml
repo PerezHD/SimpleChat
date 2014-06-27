@@ -1,7 +1,7 @@
 # SimpleChat by Harry5573 configuration
 # 
 # Prefix = Prefix to use before messages
-prefix: '&3[&eSimple&cChat&3]'
+prefix: '&8[&cArkhamChat&8]'
 #
 # Should we stop players chatting untill they have moved? (Anti BOT)
 blockchatuntilmoved: true
@@ -10,7 +10,7 @@ blockchatuntilmoved: true
 blockdupemsg: true
 #
 # Set the delay between messages (in seconds)
-delay: 3
+delay: 2
 #
 # AntiAdvertising Settings
 #

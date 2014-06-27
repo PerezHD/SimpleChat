@@ -17,6 +17,7 @@ package com.harry5573.chat;
 import com.google.common.collect.Lists;
 import com.harry5573.chat.command.CommandChat;
 import com.harry5573.chat.listener.EventListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -40,11 +41,11 @@ public class SimpleChatPlugin extends JavaPlugin {
 
     public String prefix;
 
-    public HashMap<UUID, String> lastMessage = new HashMap<>();
+    public final HashMap<UUID, String> lastMessage = new HashMap<>();
 
-    public List<UUID> hasntMoved = Lists.newArrayList();
-    public List<UUID> cantChat = Lists.newArrayList();
-    public List<UUID> advertiser = Lists.newArrayList();
+    public final List<UUID> hasntMoved = new ArrayList<>();
+    public final List<UUID> cantChat = new ArrayList<>();
+    public final List<UUID> advertiser = new ArrayList<>();
 
     private final Pattern ipPattern = Pattern.compile("((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))");
     private final Pattern webpattern = Pattern.compile("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
@@ -89,10 +90,10 @@ public class SimpleChatPlugin extends JavaPlugin {
 
     public void handleChat(Player p) {
         if (this.isChatHalted != true) {
-            Bukkit.broadcastMessage(ChatColor.RED + "Normal chat halted by " + ChatColor.YELLOW + p.getName());
+            Bukkit.broadcastMessage(prefix + ChatColor.RED + " Normal chat halted by " + ChatColor.YELLOW + p.getName());
             this.isChatHalted = true;
         } else {
-            Bukkit.broadcastMessage(ChatColor.GREEN + "Normal chat resumed by " + ChatColor.YELLOW + p.getName());
+            Bukkit.broadcastMessage(prefix + ChatColor.GREEN + " Normal chat resumed by " + ChatColor.YELLOW + p.getName());
             this.isChatHalted = false;
         }
     }
@@ -168,18 +169,24 @@ public class SimpleChatPlugin extends JavaPlugin {
                 @Override
                 public void run() {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tempban " + p.getName() + " 1month Autoban for advertising appeal at " + plugin.getConfig().getString("website"));
-                    Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + p.getName() + " Has been banned for advertising!");
+                    Bukkit.broadcastMessage(prefix + ChatColor.RED + " " + p.getName() + " Has been auto banned for trying to advertise!");
                 }
             }, 1L);
         } else {
-            p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "THAT MESSAGE WAS FLAGGED AS ADVERTISING. Do not chat again for 1 minute. (Or you will be banned!)");
+            p.sendMessage(prefix + ChatColor.DARK_RED + " " + ChatColor.BOLD + "*****************************");
+            p.sendMessage(prefix + ChatColor.RED + " Your last message was flagged as possible advertising!");
+            p.sendMessage(prefix + ChatColor.RED + " Do not talk again for 1 MINUTE or you will be banned.");
+            p.sendMessage(prefix + ChatColor.RED + " We will tell you when you can talk again.");
+            p.sendMessage(prefix + ChatColor.DARK_RED + " " + ChatColor.BOLD + "*****************************");
             advertiser.add(uniqueID);
 
             getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     if (p.isOnline()) {
-                        p.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "You are no longer flagged as an advertiser.");
+                        p.sendMessage(prefix + ChatColor.DARK_RED + " " + ChatColor.BOLD + "*****************************");
+                        p.sendMessage(prefix + ChatColor.GREEN + " You can now talk again!");
+                        p.sendMessage(prefix + ChatColor.DARK_RED + " " + ChatColor.BOLD + "*****************************");
                     }
                     plugin.advertiser.remove(uniqueID);
                 }
