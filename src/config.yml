@@ -9,9 +9,6 @@ blockchatuntilmoved: true
 # Should we block duplicate messages?
 blockdupemsg: true
 #
-# Set the delay between messages (in seconds)
-delay: 2
-#
 # AntiAdvertising Settings
 #
 # If someone postes an ip shall we ban them after a warning?

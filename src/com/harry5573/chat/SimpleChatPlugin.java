@@ -44,7 +44,6 @@ public class SimpleChatPlugin extends JavaPlugin {
     public final HashMap<UUID, String> lastMessage = new HashMap<>();
 
     public final List<UUID> hasntMoved = new ArrayList<>();
-    public final List<UUID> cantChat = new ArrayList<>();
     public final List<UUID> advertiser = new ArrayList<>();
 
     private final Pattern ipPattern = Pattern.compile("((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))");
@@ -104,19 +103,6 @@ public class SimpleChatPlugin extends JavaPlugin {
 
     public void loadPrefix() {
         this.prefix = this.translateToColorCode(this.getConfig().getString("prefix"));
-    }
-
-    public void chatCooldown(final Player p) {
-        final UUID uniqueID = p.getUniqueId();
-
-        cantChat.add(uniqueID);
-
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                plugin.cantChat.remove(uniqueID);
-            }
-        }, getConfig().getInt("delay") * 20);
     }
 
     public int checkForAdvertising(String message) {

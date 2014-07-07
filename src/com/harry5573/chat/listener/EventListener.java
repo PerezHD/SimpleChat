@@ -35,82 +35,81 @@ public class EventListener implements Listener {
     static SimpleChatPlugin plugin = SimpleChatPlugin.get();
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onChat(AsyncPlayerChatEvent e) {
-        Player p = e.getPlayer();
-        String msg = e.getMessage();
+    public void onChat(AsyncPlayerChatEvent event) {
+        Player p = event.getPlayer();
+        String msg = event.getMessage();
 
         if (p.hasPermission("simplechat.admin")) {
             return;
         }
 
         if (plugin.isChatHalted) {
-            p.sendMessage(ChatColor.GRAY + "Chat is currently halted.");
-            e.setCancelled(true);
+            p.sendMessage(plugin.prefix + ChatColor.GRAY + " Chat is currently halted.");
+            event.setCancelled(true);
             return;
         }
 
         if (plugin.getConfig().getBoolean("blockchatuntilmoved") && plugin.hasntMoved.contains(p.getUniqueId())) {
             p.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
-            e.setCancelled(true);
-            return;
-        }
-
-        if (plugin.cantChat.contains(p.getUniqueId())) {
-            p.sendMessage(ChatColor.RED + "You cannot chat again yet! (" + plugin.getConfig().getInt("delay") + " second delay)");
-            e.setCancelled(true);
+            event.setCancelled(true);
             return;
         }
 
         if (plugin.getConfig().getBoolean("blockdupemsg") != false) {
-
             if (plugin.lastMessage.containsKey(p.getUniqueId())) {
                 String oldmsg = plugin.lastMessage.get(p.getUniqueId());
                 plugin.lastMessage.remove(p.getUniqueId());
                 if (msg.contains(oldmsg)) {
-                    p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Please do not send duplicate messages!");
-                    e.setCancelled(true);
+                    p.sendMessage(plugin.prefix + ChatColor.RED + " Please do not send duplicate messages!");
+                    event.setCancelled(true);
                     plugin.lastMessage.put(p.getUniqueId(), msg);
                     return;
                 }
             }
-
             plugin.lastMessage.put(p.getUniqueId(), msg);
         }
 
         if (plugin.checkForAdvertising(msg) != 0) {
             plugin.handleAdvertiser(p);
-            e.setCancelled(true);
+            event.setCancelled(true);
             return;
         }
 
-        plugin.chatCooldown(p);
+        // GOODBYE CAPITALS!
+        event.setMessage(event.getMessage().toLowerCase());
+        event.setMessage(capitalizeFirstLetter(event.getMessage()));
+    }
+
+    public String capitalizeFirstLetter(String original) {
+        if (original.length() == 0) {
+            return original;
+        }
+        return original.substring(0, 1).toUpperCase() + original.substring(1);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onKick(PlayerKickEvent event) {
         plugin.lastMessage.remove(event.getPlayer().getUniqueId());
         plugin.hasntMoved.remove(event.getPlayer().getUniqueId());
-        plugin.cantChat.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onQuit(PlayerQuitEvent event) {
         plugin.lastMessage.remove(event.getPlayer().getUniqueId());
         plugin.hasntMoved.remove(event.getPlayer().getUniqueId());
-        plugin.cantChat.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onJoin(PlayerJoinEvent e) {
-        plugin.hasntMoved.add(e.getPlayer().getUniqueId());
+    public void onJoin(PlayerJoinEvent event) {
+        plugin.hasntMoved.add(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMove(PlayerMoveEvent e) {
-        if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) {
+    public void onMove(PlayerMoveEvent event) {
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
         }
 
-        plugin.hasntMoved.remove(e.getPlayer().getUniqueId());
+        plugin.hasntMoved.remove(event.getPlayer().getUniqueId());
     }
 }
