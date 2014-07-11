@@ -1,20 +1,7 @@
-/*Copyright (C) Harry5573 2013-14
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.chat.listener;
 
 import com.harry5573.chat.SimpleChatPlugin;
+import com.harry5573.chat.utils.ChatUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,47 +23,54 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
-        Player p = event.getPlayer();
-        String msg = event.getMessage();
+        Player player = event.getPlayer();
 
-        if (p.hasPermission("simplechat.admin")) {
+        if (player.hasPermission("simplechat.admin")) {
             return;
         }
 
         if (plugin.isChatHalted) {
-            p.sendMessage(plugin.prefix + ChatColor.GRAY + " Chat is currently halted.");
+            player.sendMessage(plugin.prefix + ChatColor.GRAY + " Chat is currently halted.");
             event.setCancelled(true);
             return;
         }
 
-        if (plugin.getConfig().getBoolean("blockchatuntilmoved") && plugin.hasntMoved.contains(p.getUniqueId())) {
-            p.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
+        if (plugin.blockChatUntilPlayerMoved && plugin.hasntMoved.contains(player.getUniqueId())) {
+            player.sendMessage(plugin.prefix + ChatColor.RED + " You cannot chat until you have moved!");
             event.setCancelled(true);
             return;
         }
 
-        if (plugin.getConfig().getBoolean("blockdupemsg") != false) {
-            if (plugin.lastMessage.containsKey(p.getUniqueId())) {
-                String oldmsg = plugin.lastMessage.get(p.getUniqueId());
-                plugin.lastMessage.remove(p.getUniqueId());
-                if (msg.contains(oldmsg)) {
-                    p.sendMessage(plugin.prefix + ChatColor.RED + " Please do not send duplicate messages!");
+        if (plugin.blockDuplicateMessages) {
+            if (plugin.lastMessage.containsKey(player.getUniqueId())) {
+                final String oldmsg = plugin.lastMessage.get(player.getUniqueId());
+
+                plugin.lastMessage.remove(player.getUniqueId());
+                if (event.getMessage().contains(oldmsg)) {
+                    player.sendMessage(plugin.prefix + ChatColor.RED + " Please do not send duplicate messages!");
                     event.setCancelled(true);
-                    plugin.lastMessage.put(p.getUniqueId(), msg);
+                    plugin.lastMessage.put(player.getUniqueId(), event.getMessage());
                     return;
                 }
             }
-            plugin.lastMessage.put(p.getUniqueId(), msg);
+            plugin.lastMessage.put(player.getUniqueId(), event.getMessage());
         }
 
-        if (plugin.checkForAdvertising(msg) != 0) {
-            plugin.handleAdvertiser(p);
+        if (ChatUtils.checkMessageForAdvertising(event.getMessage())) {
+            plugin.handleAdvertisingAttempt(player);
             event.setCancelled(true);
             return;
         }
 
         // GOODBYE CAPITALS!
         event.setMessage(event.getMessage().toLowerCase());
+
+        // GOODBYE SWEARING
+        if (plugin.blockSwearing) {
+            event.setMessage(ChatUtils.getFilteredSwearMessage(event.getMessage()));
+        }
+
+        // NICE LOOKING CHAT
         event.setMessage(capitalizeFirstLetter(event.getMessage()));
     }
 
@@ -101,11 +95,17 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
-        plugin.hasntMoved.add(event.getPlayer().getUniqueId());
+        if (plugin.blockChatUntilPlayerMoved) {
+            plugin.hasntMoved.add(event.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
+        if (!plugin.blockChatUntilPlayerMoved) {
+            return;
+        }
+        
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
         }
