@@ -32,8 +32,8 @@ public class ChatUtils {
     }
 
     public static void toggleChat(Player whoToggled) {
-        if (plugin.isChatHalted) {
-            plugin.isChatHalted = false;
+        if (!plugin.isChatHalted) {
+            plugin.isChatHalted = true;
             final Player[] onlinePlayers = plugin.getServer().getOnlinePlayers();
             for (Player player : onlinePlayers) {
                 for (int i = 0; i < 75; i++) {
@@ -45,7 +45,7 @@ public class ChatUtils {
             }
             whoToggled.sendMessage(plugin.prefix + ChatColor.RED + " You have toggled the chat OFF.");
         } else {
-            plugin.isChatHalted = true;
+            plugin.isChatHalted = false;
             final Player[] onlinePlayers = plugin.getServer().getOnlinePlayers();
             for (Player player : onlinePlayers) {
                 for (int i = 0; i < 75; i++) {
