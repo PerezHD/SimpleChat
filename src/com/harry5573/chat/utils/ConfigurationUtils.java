@@ -15,16 +15,22 @@ import java.util.Scanner;
  */
 public class ConfigurationUtils {
 
-    private static SimpleChatPlugin plugin = SimpleChatPlugin.get();
+      private static SimpleChatPlugin plugin = SimpleChatPlugin.get();
 
-    public static HashMap<String, String> loadSwearWords() {
-        HashMap<String, String> swearWords = new HashMap<>();
-        Scanner scanner = new Scanner(plugin.getResource("swearWords.txt"));
+      public static HashMap<String, String> loadSwearWords() {
+            HashMap<String, String> swearWords = new HashMap<>();
+            Scanner scanner = new Scanner(plugin.getResource("swearWords.txt"));
 
-        while (scanner.hasNextLine()) {
-            swearWords.put(scanner.next().toLowerCase(), "Swear");
-        }
-        return swearWords;
-    }
+            while (scanner.hasNext()) {
+                  try {
+                        swearWords.put(scanner.next().toLowerCase(), "Swear");
+                  } catch (Exception err) {
+                        err.printStackTrace();
+                  }
+            }
+            
+            scanner.close();
 
+            return swearWords;
+      }
 }

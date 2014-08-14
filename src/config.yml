@@ -9,6 +9,7 @@ blockSwearing: true
 antiSpam:
     blockChatUntilPlayerMoved: true
     blockDuplicateMessages: true
+    maxUppercaseLettersPerWord: 4
 
 antiAdvertising:
     # If someone postes an ip shall we ban them after a warning?
