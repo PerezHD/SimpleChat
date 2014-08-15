@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.harry5573.chat.utils;
+package com.harry5573.simplechat.utils;
 
-import com.harry5573.chat.SimpleChatPlugin;
+import com.harry5573.simplechat.SimpleChatPlugin;
 import java.util.regex.Matcher;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
  */
 public class ChatUtils {
 
-      static SimpleChatPlugin plugin = SimpleChatPlugin.get();
+      private static SimpleChatPlugin plugin = SimpleChatPlugin.getPlugin();
 
       public static void clearChat(Player whoCleared) {
             final Player[] onlinePlayers = plugin.getServer().getOnlinePlayers();
@@ -151,8 +151,10 @@ public class ChatUtils {
             StringBuilder newMessage = new StringBuilder();
 
             for (String word : message.split(" ")) {
-                  if (newMessage.length() != 0) {
-                        newMessage.append(" ");
+                  //We do not want to break the first char.
+                  if (word.length() <= 1) {
+                        newMessage.append(word);
+                        continue; // Don't care.
                   }
 
                   if (getUppercaseCount(word) > plugin.maxUppercaseLettersPerWord) {

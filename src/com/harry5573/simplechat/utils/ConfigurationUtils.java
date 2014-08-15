@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.harry5573.chat.utils;
+package com.harry5573.simplechat.utils;
 
-import com.harry5573.chat.SimpleChatPlugin;
+import com.harry5573.simplechat.SimpleChatPlugin;
 import java.util.HashMap;
 import java.util.Scanner;
+import lombok.Cleanup;
 
 /**
  *
@@ -15,10 +16,12 @@ import java.util.Scanner;
  */
 public class ConfigurationUtils {
 
-      private static SimpleChatPlugin plugin = SimpleChatPlugin.get();
+      private static SimpleChatPlugin plugin = SimpleChatPlugin.getPlugin();
 
       public static HashMap<String, String> loadSwearWords() {
             HashMap<String, String> swearWords = new HashMap<>();
+
+            @Cleanup
             Scanner scanner = new Scanner(plugin.getResource("swearWords.txt"));
 
             while (scanner.hasNext()) {
@@ -28,9 +31,6 @@ public class ConfigurationUtils {
                         err.printStackTrace();
                   }
             }
-            
-            scanner.close();
-
             return swearWords;
       }
 }

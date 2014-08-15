@@ -1,7 +1,7 @@
-package com.harry5573.chat.listener;
+package com.harry5573.simplechat.listener;
 
-import com.harry5573.chat.SimpleChatPlugin;
-import com.harry5573.chat.utils.ChatUtils;
+import com.harry5573.simplechat.SimpleChatPlugin;
+import com.harry5573.simplechat.utils.ChatUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public class EventListener implements Listener {
 
-      static SimpleChatPlugin plugin = SimpleChatPlugin.get();
+      private static SimpleChatPlugin plugin = SimpleChatPlugin.getPlugin();
 
       @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
       public void onChat(AsyncPlayerChatEvent event) {
@@ -62,17 +62,14 @@ public class EventListener implements Listener {
                   return;
             }
 
-            // GOODBYE SWEARING
+            if (!ChatUtils.checkMessageForWebPattern(event.getMessage())) {
+                  event.setMessage(ChatUtils.getFilteredUppercaseMessage(event.getMessage()));
+            }
+
             if (plugin.blockSwearing) {
                   event.setMessage(ChatUtils.getFilteredSwearMessage(event.getMessage()));
             }
 
-            if (!ChatUtils.checkMessageForWebPattern(event.getMessage())) {
-                  // NOT TOO MANY CAPITALS IF NO URL
-                  event.setMessage(ChatUtils.getFilteredUppercaseMessage(event.getMessage()));
-            }
-
-            // NICE LOOKING CHAT
             event.setMessage(capitalizeFirstLetter(event.getMessage()));
       }
 
