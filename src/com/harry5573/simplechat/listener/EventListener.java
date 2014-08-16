@@ -70,6 +70,10 @@ public class EventListener implements Listener {
                   event.setMessage(ChatUtils.getFilteredSwearMessage(event.getMessage()));
             }
 
+            if (plugin.removeColors) {
+                  event.setMessage(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', event.getMessage())));
+            }
+
             event.setMessage(capitalizeFirstLetter(event.getMessage()));
       }
 

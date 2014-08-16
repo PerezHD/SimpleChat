@@ -5,6 +5,7 @@ prefix: '&8[&cArkhamChat&8]'
 websiteURL: 'www.arkhamnetwork.org'
 
 blockSwearing: true
+removeColors: true
 
 antiSpam:
     blockChatUntilPlayerMoved: true

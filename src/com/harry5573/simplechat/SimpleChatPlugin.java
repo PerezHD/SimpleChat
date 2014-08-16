@@ -41,6 +41,7 @@ public class SimpleChatPlugin extends JavaPlugin {
       public boolean banOnIpPost = true;
       public boolean banOnWeblinkPost = true;
       public int maxUppercaseLettersPerWord = 0;
+      public boolean removeColors = true;
 
       public HashMap<String, String> swearWords = new HashMap<>();
 
@@ -81,6 +82,7 @@ public class SimpleChatPlugin extends JavaPlugin {
             this.banOnIpPost = getConfig().getBoolean("antiAdvertising.banOnIpPost");
             this.banOnWeblinkPost = getConfig().getBoolean("antiAdvertising.banOnWeblinkPost");
             this.maxUppercaseLettersPerWord = getConfig().getInt("antiSpam.maxUppercaseLettersPerWord");
+            this.removeColors = getConfig().getBoolean("removeColors");
 
             swearWords.clear();
             swearWords.putAll(ConfigurationUtils.loadSwearWords());
