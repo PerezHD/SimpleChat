@@ -127,12 +127,6 @@ public class ChatUtils {
             StringBuilder newMessage = new StringBuilder();
 
             for (String word : message.split(" ")) {
-                  //We do not want to break the first char.
-                  if (word.length() <= 1) {
-                        newMessage.append(word);
-                        continue; // Don't care.
-                  }
-
                   if (newMessage.length() != 0) {
                         newMessage.append(" ");
                   }
@@ -151,12 +145,6 @@ public class ChatUtils {
             StringBuilder newMessage = new StringBuilder();
 
             for (String word : message.split(" ")) {
-                  //We do not want to break the first char.
-                  if (word.length() <= 1) {
-                        newMessage.append(word);
-                        continue; // Don't care.
-                  }
-
                   if (getUppercaseCount(word) > plugin.maxUppercaseLettersPerWord) {
                         newMessage.append(word.toLowerCase());
                   } else {
