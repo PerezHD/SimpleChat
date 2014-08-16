@@ -64,6 +64,7 @@ public class EventListener implements Listener {
 
             if (!ChatUtils.checkMessageForWebPattern(event.getMessage())) {
                   event.setMessage(ChatUtils.getFilteredUppercaseMessage(event.getMessage()));
+                  event.setMessage(capitalizeFirstLetter(event.getMessage()));
             }
 
             if (plugin.blockSwearing) {
@@ -73,8 +74,6 @@ public class EventListener implements Listener {
             if (plugin.removeColors) {
                   event.setMessage(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', event.getMessage())));
             }
-
-            event.setMessage(capitalizeFirstLetter(event.getMessage()));
       }
 
       public String capitalizeFirstLetter(String original) {
