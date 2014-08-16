@@ -127,8 +127,13 @@ public class ChatUtils {
             StringBuilder newMessage = new StringBuilder();
 
             for (String word : message.split(" ")) {
-                  if (newMessage.length() != 0) {
+                  if (newMessage.length() > 0) {
                         newMessage.append(" ");
+                  }
+
+                  if (word.length() <= 1) {
+                        newMessage.append(word);
+                        continue;
                   }
 
                   if (plugin.swearWords.get(word.toLowerCase()) != null && plugin.swearWords.get(word.toLowerCase()).equals("Swear")) {
@@ -145,6 +150,15 @@ public class ChatUtils {
             StringBuilder newMessage = new StringBuilder();
 
             for (String word : message.split(" ")) {
+                  if (newMessage.length() > 0) {
+                        newMessage.append(" ");
+                  }
+
+                  if (word.length() <= 1) {
+                        newMessage.append(word);
+                        continue;
+                  }
+
                   if (getUppercaseCount(word) > plugin.maxUppercaseLettersPerWord) {
                         newMessage.append(word.toLowerCase());
                   } else {
