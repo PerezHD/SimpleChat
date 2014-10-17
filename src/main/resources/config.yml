@@ -1,19 +1,46 @@
-# SimpleChat by Harry5573 configuration
+########################################################
+############### SimpleChat Configuration ###############
+########################################################
 
-# General messaging settings.
-prefix: '&8[&cArkhamChat&8]'
-websiteURL: 'www.arkhamnetwork.org'
+# The prefix that will be used before all messages.
+message_prefix: '&6SimpleChat&8&l>&r'
 
-blockSwearing: true
-removeColors: true
+# Permissions
+# If you want a user to be able to bypass filters and control the chat, give them the permission simplechat.admin
 
-antiSpam:
-    blockChatUntilPlayerMoved: true
-    blockDuplicateMessages: true
-    maxUppercaseLettersPerWord: 4
-
-antiAdvertising:
-    # If someone postes an ip shall we ban them after a warning?
-    banOnIpPost: true
-    # If someone postes a url shall we ban them after a warning?
-    banOnWeblinkPost: true
+# Configure the avaliable filters.
+# These filters will run in order from top-bottom. 
+filters:
+      # If enabled this filter will filter the maximum amount of times a user can chat per minute. If they exceed this limit they will be kicked from the server and denied to join for X seconds.
+      rate-limit:
+            enabled: true
+            max-chats-per-minute: 10
+            kick-deny-join-time-seconds: 60
+      # If enabled this filter will stop players from being able to chat until they have moved.
+      no-chat-until-moved:
+            enabled: true
+            # How many blocks does a player have to move to be allowed to chat?
+            needed-blocks-to-move: 5
+      # If enabled this filter will block duplicate messages from being said twice in the same amount of time.
+      no-duplicate-messages:
+            enabled: true
+            # After how many seconds should we not care if its the same message?
+            # Set to -1 for no timeout.
+            # Setting to 0 will mean an instant timeout.
+            timeout-time-seconds: 5
+      # If enabled this filter will attempt to filter out ip addresses in chat messages.
+      advertising-ipaddress:
+            enabled: true
+      # If enabled this filter will attempt to filter out url's in chat messages.
+      advertising-url:
+            enabled: true
+      # If enabled this filter will attempt to filter out swear words in chat messages.
+      no-swear:
+            enabled: true
+      # If enabled we will filter out cappital letters if the amount of them exceeds the max uppercase letters.
+      max-uppercase-letters:
+            enabled: true
+            max-uppercase-letters: 4
+      # If enabled we will force the first letter of every sentence to upper case. This makes chat look better.
+      force-first-letter-to-uppercase:
+            enabled: true

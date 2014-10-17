@@ -4,11 +4,11 @@
       
       <groupId>com.harry5573</groupId>
       <artifactId>SimpleChat</artifactId>
-      <version>0.1</version>
+      <version>0.2-ALPHA</version>
       <packaging>jar</packaging>
       <name>SimpleChat</name>
-      <description>Simple chat cleaning plugin!</description>
-      <url>https://www.harry5573.net.</url>
+      <description>Simple chat manager plugin for minecraft servers built on the Bukkit API.</description>
+      <url>https://www.battlepvp.com/</url>
       
       <properties>
             <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,7 +46,7 @@
                         <artifactId>maven-jar-plugin</artifactId>
                         <version>2.3.1</version>
                         <configuration>
-                              <outputDirectory>C:\Users\devan_000\Documents\Minecraft\CODING\Test Server\plugins</outputDirectory>
+                              <outputDirectory>C:\Users\devan_000\Dropbox\Public\TestServerPluginJars</outputDirectory>
                         </configuration>
                   </plugin>
             </plugins>
