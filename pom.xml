@@ -46,7 +46,7 @@
                         <artifactId>maven-jar-plugin</artifactId>
                         <version>2.3.1</version>
                         <configuration>
-                              <outputDirectory>C:\Users\devan_000\Dropbox\Public\TestServerPluginJars</outputDirectory>
+                              <outputDirectory>C:\Users\Harry\Dropbox\Public\TestServerPluginJars</outputDirectory>
                         </configuration>
                   </plugin>
             </plugins>

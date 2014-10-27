@@ -40,7 +40,7 @@ public class FilterAdvertisingIPAddress extends Filter<AsyncPlayerChatEvent> {
             }
       }
 
-      private final Pattern ip_address_pattern = Pattern.compile("(?:\\d{1,3}[.,-:;\\/()=?}+ ]{1,4}){3}\\d{1,3}");
+      private final Pattern ip_address_pattern = Pattern.compile("((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))");
 
       @Override
       public void handleEvent(final AsyncPlayerChatEvent event) {
